@@ -12,7 +12,7 @@ ciudad = ''
 # exportar libreria para leer xls
 
 
-ruta = 'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\archivos_entrad\\Log-Vuelos.xlsx'
+#ruta = 'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\archivos_entrad\\Log-Vuelos.xlsx'
 
 
 
@@ -94,4 +94,4 @@ def leer_api_meteo(lugar):
 # SALIDA este objeto de salida se utilizará en las transformaciones
 
 
-print(leer_api_meteo('Madrid'))
+#print(leer_api_meteo('Madrid'))

@@ -54,10 +54,11 @@ def filtrar_por_fecha(datos, fecha, hora):
 
 
 
-    objetivo = f"{fecha}T{hora}"
+    objetivo = f'{fecha[0:4]}-{fecha[4:6]}-{fecha[6:8]}T{hora[0:2]}:{hora[2:4]}:00+0000'
+
 
     for dato in datos:
-        if dato["fint"].startswith(objetivo):  #este filtro no parece que funcione REVISAR
+        if dato["fint"] == objetivo:  #este filtro no parece que funcione REVISAR
             return dato
 
     return None
@@ -76,4 +77,13 @@ def consultar_meteo(lat, lon, fecha, hora):
 
 #taragudo 40.820730, -3.093183
 
-print(consultar_meteo(40.820730, -3.093183, 20260211, 1200))
+#print(consultar_meteo(40.820730, -3.093183, '20260211', '1200'))
+
+
+
+#2026-02-11T20:00:00+0000
+
+fecha = '20260211'
+hora = '1200'
+
+print(f'Fecha: {fecha[0:4]}-{fecha[4:6]}-{fecha[6:8]}T{hora[0:2]}:{hora[2:4]}:00+0000')
