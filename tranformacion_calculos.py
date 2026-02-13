@@ -1,9 +1,10 @@
 import pandas as pd
 from numpy import dtype
-
-from aemet_lat_log_time import fecha_inicio
 from ingestion_datos import lector_excel
 import aemet_lat_log_time
+import os
+
+
 
 #variables
 ruta = 'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\archivos_entrad\\Log-Vuelos.xlsx'
@@ -77,9 +78,24 @@ def datos_meteo(df):
     fecha_inicio = (f'{str(df["Fecha"].min())[0:10]}T00:00:00UTC')
     fecha_fin = (f'{str(df["Fecha"].max())[0:10]}T00:00:00UTC')
 
-    print(f'esta es la fecha de inicio: {fecha_inicio} esta la de fin {fecha_fin}')
+    nombre_archivo_meteo = f'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\exp_archivos_salida\\meteo_{str(df["Fecha"].min())[0:10]}_{str(df["Fecha"].max())[0:10]}.csv'
+    print('-----------------nombre_archivo_meteo-------------------')
+    print(nombre_archivo_meteo)
 
-    df = aemet_lat_log_time.consultar_meteo(lon, lat, fecha_inicio, fecha_fin)
+
+   #comprobar si hay un csv con primera y ultima fechas como las de inicio y fin
+    if os.path.isfile(nombre_archivo_meteo):
+        print("El archivo existe.")
+        df = pd.read_csv(nombre_archivo_meteo)
+
+    else:
+        print("El archivo no existe.")
+        # si se ha generado leer el csv y generar el df del csv
+        # si no coinciden ejecutar toda la API. generar nuevo df
+
+        print(f'esta es la fecha de inicio: {fecha_inicio} esta la de fin {fecha_fin}')
+
+        df = aemet_lat_log_time.consultar_meteo(lon, lat, fecha_inicio, fecha_fin)
 
     return df
 
@@ -92,6 +108,9 @@ df_meteo = datos_meteo(df_log)
 print('-----------------------------meteo---------------------------')
 print(df_meteo)
 
+df_resultado = pd.merge(df_log, df_meteo, left_on='Fecha', right_on='horatmax', how='left')
+
+print(df_resultado)
 
 
     # esta tabla que se genera sera la entrad de datos de la visualización

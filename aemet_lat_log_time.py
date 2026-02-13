@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 import logging
 
+
 # 1. Creamos el logger
 logger = logging.getLogger("mi_app")
 logger.setLevel(logging.DEBUG)
@@ -175,6 +176,10 @@ def consultar_meteo(lat, lon, fecha_inicio, fecha_fin):
 
         datos = pd.concat([datos, datosnew], ignore_index=True)
 
+
+    datos.to_csv(f'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\exp_archivos_salida\\meteo_{fecha_inicio[0:10]}_{fecha_fin[0:10]}.csv', index=False)
+    logger.info("Generado el csv ")
+
     #hasta aqui tenemos los datos de un periodo extraidos
 
  # hay que recoger  la hora más cercana filtrar hora y dia
@@ -191,9 +196,8 @@ lon = -3.093183
 fecha_inicio = '2024-11-01T12:00:00UTC'
 fecha_fin = '2026-02-01T12:00:00UTC'
 
-
+#consultar_meteo(lat, lon, fecha_inicio, fecha_fin)
 
 
 #df = consultar_meteo(lat, lon, fecha_inicio, fecha_fin)
 
-#df.to_csv('meteo_export.csv', index=False)
