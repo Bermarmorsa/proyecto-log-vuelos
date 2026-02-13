@@ -1,12 +1,18 @@
 import pandas as pd
 from numpy import dtype
 
+from aemet_lat_log_time import fecha_inicio
 from ingestion_datos import lector_excel
+import aemet_lat_log_time
 
 #variables
 ruta = 'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\archivos_entrad\\Log-Vuelos.xlsx'
+lat = 40.820730
+lon = -3.093183
 
-def transformaciones(ruta):
+
+
+def transformaciones_log(ruta):
 
     df_log = lector_excel(ruta)
 
@@ -54,23 +60,51 @@ def transformaciones(ruta):
 
     min_fecha = df_log_lf["Fecha"].min()
 
-    print(min_fecha)
+    #print(min_fecha)
 
     #df_log_lf['frecuencia_vuelos'] = df_log_lf["acumulado_decimales"] / (df_log_lf["Fecha"] - min_fecha )
 
     df_log_lf['frecuencia_vuelos'] = round((df_log_lf["Fecha"] - min_fecha ).dt.days / df_log_lf["acumulado_decimales"],2)
 
+    return df_log_lf
 
 
-    #añadir en nuevas columnas los datos de la meteo.
 
+    #obtener datos de meteo en nuevas columnas los datos de la meteo.
+
+def datos_meteo(df):
+
+    fecha_inicio = (f'{str(df["Fecha"].min())[0:10]}T00:00:00UTC')
+    fecha_fin = (f'{str(df["Fecha"].max())[0:10]}T00:00:00UTC')
+
+    print(f'esta es la fecha de inicio: {fecha_inicio} esta la de fin {fecha_fin}')
+
+    df = aemet_lat_log_time.consultar_meteo(lon, lat, fecha_inicio, fecha_fin)
+
+    return df
+
+
+df_log= transformaciones_log(ruta)
+print('-----------------------------log---------------------------')
+print(df_log)
+
+df_meteo = datos_meteo(df_log)
+print('-----------------------------meteo---------------------------')
+print(df_meteo)
 
 
 
     # esta tabla que se genera sera la entrad de datos de la visualización
 
-    return df_log_lf
+#cruce pandas
+
+# primero filtrar los datos meteo para trare solo fechas concretas y las horas entre el inicio y el fin del vuelo.
 
 
-print(transformaciones(ruta))
+
+#df_resultado = pd.merge(df1, df2, on='id_cliente', how='inner')
+
+
+
+#print(datos_meteo())
 
