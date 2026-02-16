@@ -1,5 +1,9 @@
+import datetime
+
 import pandas as pd
 from numpy import dtype
+from urllib3.util.util import to_str
+
 from ingestion_datos import lector_excel
 import aemet_lat_log_time
 import os
@@ -102,15 +106,56 @@ def datos_meteo(df):
 
 df_log= transformaciones_log(ruta)
 print('-----------------------------log---------------------------')
-print(df_log)
+# añado una campo de fecha convertido en string
+print(df_log.dtypes)
+df_log.to_csv('salida_left_log.csv')
+df_log = df_log.sort_values("Hora Fin")
 
+#cargamos la meteo
 df_meteo = datos_meteo(df_log)
+#df_meteo['hora'] = df_meteo['horatmax']
+#df_meteo["hora"] = pd.to_datetime(df_meteo["hora"], format="%H:%M")
 print('-----------------------------meteo---------------------------')
+
+# Para crear la fecha como la que hay en el log
+
+# Mantener solo las filas donde horatmax != "Varias"
+
+df_meteo = df_meteo[df_meteo["horatmax"] != "Varias"]
+
+df_meteo['fecha_hora'] = df_meteo["fecha"].str.strip() + " " + df_meteo["horatmax"].str.strip() + ":00"
+
+# 2) Parsear a datetime (por defecto queda en datetime64[ns])
+df_meteo["fecha_hora"] = pd.to_datetime(df_meteo['fecha_hora'], format="%Y-%m-%d %H:%M:%S", errors="raise")
+
+# fitramos los nulos
+df_meteo = df_meteo[df_meteo["fecha_hora"].notna()]
+
+# antes del cruce hay que ordenar los dartaframes
+df_meteo = df_meteo.sort_values("fecha_hora")
+
 print(df_meteo)
+print(df_meteo.dtypes)
+# 3) Si NECESITAS estrictamente datetime64[us]
+#df_meteo["fecha_hora"] = df_meteo["fecha_hora"].astype("datetime64[us]")
 
-df_resultado = pd.merge(df_log, df_meteo, left_on='Fecha', right_on='horatmax', how='left')
 
-print(df_resultado)
+df_meteo.to_csv('salida_right_meteo.csv')
+
+
+df_resultado = pd.merge_asof(
+    df_log, df_meteo,
+    left_on="Hora Fin",
+    right_on='fecha_hora', # o left_on/right_on si se llaman distinto
+    direction="nearest"     # o 'backward'/'forward'
+)
+
+
+
+
+df_resultado.to_csv('salida_join.csv')
+
+
 
 
     # esta tabla que se genera sera la entrad de datos de la visualización
