@@ -1,19 +1,20 @@
-import datetime
-
 import pandas as pd
-from numpy import dtype
-from urllib3.util.util import to_str
 
 from ingestion_datos import lector_excel
 import aemet_lat_log_time
 import os
+from loguru import logger
+from pathlib import Path
 
-
+BASE_DIR = Path(__file__).resolve().parent
+print('base dir: ')
+print(BASE_DIR)
 
 #variables
 ruta = 'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\archivos_entrad\\Log-Vuelos.xlsx'
 lat = 40.820730
 lon = -3.093183
+
 
 
 
@@ -83,21 +84,20 @@ def datos_meteo(df):
     fecha_fin = (f'{str(df["Fecha"].max())[0:10]}T00:00:00UTC')
 
     nombre_archivo_meteo = f'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\exp_archivos_salida\\meteo_{str(df["Fecha"].min())[0:10]}_{str(df["Fecha"].max())[0:10]}.csv'
-    print('-----------------nombre_archivo_meteo-------------------')
-    print(nombre_archivo_meteo)
+
 
 
    #comprobar si hay un csv con primera y ultima fechas como las de inicio y fin
     if os.path.isfile(nombre_archivo_meteo):
-        print("El archivo existe.")
+        logger.info("El archivo de meteo existe.")
         df = pd.read_csv(nombre_archivo_meteo)
 
     else:
-        print("El archivo no existe.")
+        logger.info("El archivo no existe. Conectatemos con la API")
         # si se ha generado leer el csv y generar el df del csv
         # si no coinciden ejecutar toda la API. generar nuevo df
 
-        print(f'esta es la fecha de inicio: {fecha_inicio} esta la de fin {fecha_fin}')
+        logger.info(f'esta es la fecha de inicio: {fecha_inicio} esta la de fin {fecha_fin}')
 
         df = aemet_lat_log_time.consultar_meteo(lon, lat, fecha_inicio, fecha_fin)
 
@@ -108,7 +108,7 @@ df_log= transformaciones_log(ruta)
 print('-----------------------------log---------------------------')
 # añado una campo de fecha convertido en string
 print(df_log.dtypes)
-df_log.to_csv('salida_left_log.csv')
+df_log.to_csv('\\exp_archivos_salida\\salida_left_log.csv')
 df_log = df_log.sort_values("Hora Fin")
 
 #cargamos la meteo
@@ -140,7 +140,7 @@ print(df_meteo.dtypes)
 #df_meteo["fecha_hora"] = df_meteo["fecha_hora"].astype("datetime64[us]")
 
 
-df_meteo.to_csv('salida_right_meteo.csv')
+df_meteo.to_csv('C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\exp_archivos_salidasalida_right_meteo.csv')
 
 
 df_resultado = pd.merge_asof(
@@ -153,7 +153,7 @@ df_resultado = pd.merge_asof(
 
 
 
-df_resultado.to_csv('salida_join.csv')
+df_resultado.to_csv('\\exp_archivos_salida\\salida_join.csv')
 
 
 

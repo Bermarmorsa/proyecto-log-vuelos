@@ -5,6 +5,11 @@ import os
 from dotenv import load_dotenv
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+from loguru import logger
+from pathlib import Path
+
+
+BASE_DIR = Path(__file__).resolve().parent
 
 
 load_dotenv()
@@ -155,8 +160,11 @@ def consultar_meteo(lat, lon, fecha_inicio, fecha_fin):
 
         datos = pd.concat([datos, datosnew], ignore_index=True)
 
+    nombre_archivo_meteo = BASE_DIR / "archivos_salida"
+    nombre_archivo= f'meteo_{fecha_inicio[0:10]}_{fecha_fin[0:10]}.csv'
 
-    datos.to_csv(f'C:\\Users\\b.martin\\Documents\\Workspace\\proyecto_vuelos\\exp_archivos_salida\\meteo_{fecha_inicio[0:10]}_{fecha_fin[0:10]}.csv', index=False)
+
+    datos.to_csv( Path(nombre_archivo_meteo / nombre_archivo), index=False)
     logger.info("Generado el csv ")
 
     #hasta aqui tenemos los datos de un periodo extraidos

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "log_vuelos"
+version = "0.1.0"
+description = "Un software bien estructurado con logs"
+dependencies = [
+    "loguru",
+    "pandas",
+    "xlsxwriter",
+    "python-dotenv",
+]
+
+[project.scripts]
+mi-app = "log_vuelos.main:main"
