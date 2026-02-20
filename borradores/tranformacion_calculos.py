@@ -30,7 +30,7 @@ def transformaciones_log(ruta):
     df_log_i = df_log[df_log["tipo vuelo"].fillna("").str.strip() == "I"]
 
 
-    df_log_lf = df_log_i[['tipo vuelo','Fecha','Hora inicio','Hora Fin','Avion','Aerodromo Origen','Aerodromo Destino']]
+    df_log_lf = df_log_i[['tipo vuelo','Fecha','Hora inicio','Hora Fin','Avion','Aerodromo Origen','Aerodromo Destino','Observaciones']]
 
     #pasar los datos de horas de inicio y fin a fecha
 

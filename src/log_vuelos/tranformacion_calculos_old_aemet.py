@@ -1,6 +1,6 @@
 import pandas as pd
 from src.log_vuelos.ingestion_datos import lector_excel
-from src.log_vuelos import open_meteo
+from src.log_vuelos import aemet_lat_log_time
 import os
 from loguru import logger
 from pathlib import Path
@@ -89,15 +89,15 @@ def datos_meteo(df):
     print('-----------------contenido df log para buscar fechas min y max-------------------')
     print(df)
 
-    fecha_inicio_to_met = f'{str(df["Fecha"].min())[0:10]}'
+    fecha_inicio_to_met = f'{str(df["Fecha"].min())[0:10]}T00:00:00UTC'
     print('Fecha inicio: ',fecha_inicio_to_met)
-    fecha_fin_to_met = f'{str(df["Fecha"].max())[0:10]}'
-    nombre_archivo = f'meteo_open_{fecha_inicio_to_met[0:10]}_{fecha_fin_to_met[0:10]}.csv'
+    fecha_fin_to_met = f'{str(df["Fecha"].max())[0:10]}T00:00:00UTC'
+    nombre_archivo = f'meteo_{str(df["Fecha"].min())[0:10]}_{str(df["Fecha"].max())[0:10]}.csv'
 
     nombre_archivo_meteo = BASE_DIR / "archivos_salida" / nombre_archivo
 
     logger.info('-----------------nombre_archivo_meteo-------------------')
-    logger.info(nombre_archivo)
+    logger.info(nombre_archivo_meteo)
 
 
    #comprobar si hay un csv con primera y ultima fechas como las de inicio y fin
@@ -107,15 +107,12 @@ def datos_meteo(df):
 
     else:
         logger.info("El archivo csv de meteo no existe. Recargamos los datos desde la API.")
-        logger.info(nombre_archivo_meteo)
         # si se ha generado leer el csv y generar el df del csv
         # si no coinciden ejecutar toda la API. generar nuevo df
 
         logger.info(f'esta es la fecha de inicio: {fecha_inicio_to_met} esta la de fin {fecha_fin_to_met}')
 
-        df = open_meteo.df_meteo_open(fecha_inicio_to_met, fecha_fin_to_met, lon, lat)
-        #print('-----------------------OBTENER DATOS METEO OPEN')
-        #print(df)
+        df = aemet_lat_log_time.consultar_meteo(lon, lat, fecha_inicio_to_met, fecha_fin_to_met)
 
     return df
 
@@ -138,19 +135,14 @@ def join_log_meteo():
     # Para crear la fecha como la que hay en el log
 
     # Mantener solo las filas donde horatmax != "Varias"
-    #df_meteo = df_meteo[df_meteo["horatmax"] != "Varias"]
-    try:
-        df_meteo['fecha_hora'] = df_meteo["date"]
-        print(f'--------------------------------formato de fecha en meteo {df_meteo["fecha_hora"]}')
-        df_meteo["fecha_hora"] = pd.to_datetime(df_meteo['fecha_hora'], format="%Y-%m-%d %H:%M:%S", errors="raise")
-
-        # fitramos los nulos
-        df_meteo = df_meteo[df_meteo["fecha_hora"].notna()]
-        # antes del cruce hay que ordenar los dartaframes
-        df_meteo = df_meteo.sort_values("fecha_hora")
-        logger.info('Filtrados de meteo y orden previo a join')
-    except Exception as e:
-        logger.info(e)
+    df_meteo = df_meteo[df_meteo["horatmax"] != "Varias"]
+    df_meteo['fecha_hora'] = df_meteo["fecha"].str.strip() + " " + df_meteo["horatmax"].str.strip() + ":00"
+    df_meteo["fecha_hora"] = pd.to_datetime(df_meteo['fecha_hora'], format="%Y-%m-%d %H:%M:%S", errors="raise")
+    # fitramos los nulos
+    df_meteo = df_meteo[df_meteo["fecha_hora"].notna()]
+    # antes del cruce hay que ordenar los dartaframes
+    df_meteo = df_meteo.sort_values("fecha_hora")
+    logger.info('Filtrados de meteo y orden previo a join')
 
     #print(df_meteo)
     #print(df_meteo.dtypes)

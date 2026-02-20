@@ -68,8 +68,9 @@ def añadir_grafico_lineas(writer, df, campo_x, campo_y, graf_name, posicion_hoj
     grafico.set_title({'name': graf_name})
     grafico.set_x_axis({'name': campo_x,
                         'date_axis': True,
-                        'num_format': 'yyyy-mm-dd' } )
-    grafico.set_y_axis({'name': campo_y})
+                        'num_format': 'YYYY-MM-DD' } )
+    grafico.set_y_axis({'name': campo_y,
+                        'num_format': '#.##0,00'} )
     grafico.set_size({'width': width, 'height': height})
 
     # Insertar el gráfico
@@ -81,6 +82,8 @@ def ejecutar_reporte_vuelos():
     df_final["Fecha"] = pd.to_datetime(df_final["Fecha"])
 
     print(df_final.dtypes)
+
+
 
     # 2. Calcular KPIs básicos para la segunda hoja
     # Ejemplo: Coste total y tiempo total de vuelo
