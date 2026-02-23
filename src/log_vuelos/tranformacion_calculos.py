@@ -92,7 +92,7 @@ def datos_meteo(df):
     fecha_inicio_to_met = f'{str(df["Fecha"].min())[0:10]}'
     print('Fecha inicio: ',fecha_inicio_to_met)
     fecha_fin_to_met = f'{str(df["Fecha"].max())[0:10]}'
-    nombre_archivo = f'meteo_open_{fecha_inicio_to_met[0:10]}_{fecha_fin_to_met[0:10]}.csv'
+    nombre_archivo = f'meteo_open_{fecha_inicio_to_met[0:10]}_{fecha_fin_to_met[0:10]}.parquet'
 
     nombre_archivo_meteo = BASE_DIR / "archivos_salida" / nombre_archivo
 
@@ -103,7 +103,7 @@ def datos_meteo(df):
    #comprobar si hay un csv con primera y ultima fechas como las de inicio y fin
     if os.path.isfile(nombre_archivo_meteo):
         logger.info("El archivo existe.")
-        df = pd.read_csv(nombre_archivo_meteo)
+        df = pd.read_parquet(nombre_archivo_meteo)
 
     else:
         logger.info("El archivo csv de meteo no existe. Recargamos los datos desde la API.")
@@ -157,7 +157,40 @@ def join_log_meteo():
 
 
 
-    #df_meteo.to_csv('salida_right_meteo.csv')
+
+    print('------------tipo log----------------------')
+    print(df_log.dtypes)
+    print('------------tipo meteo----------------------')
+    print(df_meteo.dtypes)
+
+    # cambiar tipo de campo de cruce en el log
+    df_log["Hora Fin"] = df_log["Hora Fin"].dt.tz_localize(None)
+
+    #cambiar fecha de cruce en meteo
+
+    #df_meteo["fecha_hora"] = df_meteo["fecha_hora"].astype("datetime64[us]")
+
+    df_meteo["fecha_hora"] = (
+        df_meteo["fecha_hora"]
+        .dt.tz_localize(None)
+        .astype("datetime64[s]")  # quita sub-segundos
+        .astype("datetime64[us]")  # misma info pero en resolución us
+    )
+
+    df_meteo["date"] = (
+        df_meteo["date"]
+        .dt.tz_localize(None)
+        .astype("datetime64[s]")  # quita sub-segundos
+        .astype("datetime64[us]")  # misma info pero en resolución us
+    )
+
+    print('------------tipo log despues de cambio fecha----------------------')
+    print(df_log.dtypes)
+    print('------------tipo log despues de cambio fecha----------------------')
+    print(df_meteo.dtypes)
+    print('------------tipo log despues de cambio fecha fin----------------------')
+
+
 
     # union de los dataframes de por la fecha y hora mas cercanas para añadir los datos de estación mas proximos a la hora y dia del vuelo.
     df_resultado = pd.merge_asof(

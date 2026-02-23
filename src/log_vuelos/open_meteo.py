@@ -3,6 +3,7 @@ import openmeteo_requests
 import pandas as pd
 import requests_cache
 from retry_requests import retry
+import fastparquet
 
 
 
@@ -81,6 +82,12 @@ def df_meteo_open(start_date, end_date, longitude, latitude):
 	hourly_dataframe = pd.DataFrame(data = hourly_data)
 	logger.info("\nHourly data\n", hourly_dataframe)
 
+
+	ruta_meteo = BASE_DIR / "archivos_salida"
+	nombre_archivo = f'meteo_open_{start_date[0:10]}_{end_date[0:10]}.parquet'
+	ruta_parquet_meteo = Path(ruta_meteo / nombre_archivo)
+
+	hourly_dataframe.to_parquet(ruta_parquet_meteo, index=False)
 
 	return  hourly_dataframe
 

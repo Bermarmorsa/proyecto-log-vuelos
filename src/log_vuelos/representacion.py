@@ -100,9 +100,9 @@ def ejecutar_reporte_vuelos():
         df_final.to_excel(writer, sheet_name='Datos_Completos', index=False)
         df_kpis.to_excel(writer, sheet_name='KPIs', startrow=1)
         # para generar las graficas
-        añadir_grafico_lineas(writer, df_final, "Fecha" , "frecuencia_vuelos", 'Evol Frecuencia', 'V5', 800, 400)
-        añadir_grafico_lineas(writer, df_final, "Fecha", "acumulado_decimales" , 'Acumulado horas', 'V30', 800, 400)
-        añadir_grafico_lineas(writer, df_final, "Fecha", "coste", 'Acumulado coste', 'V51', 800, 400)
+        añadir_grafico_lineas(writer, df_final, "Fecha" , "frecuencia_vuelos", 'Evol Frecuencia', 'AD5', 800, 400)
+        añadir_grafico_lineas(writer, df_final, "Fecha", "acumulado_decimales" , 'Acumulado horas', 'AD30', 800, 400)
+        añadir_grafico_lineas(writer, df_final, "Fecha", "coste", 'Acumulado coste', 'AD51', 800, 400)
 
         # Guardamos
         writer.close()
