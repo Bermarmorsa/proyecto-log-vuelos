@@ -95,3 +95,5 @@ lat = 40.820730
 lon = -3.093183
 
 #df_meteo_open('2024-01-01', '2026-02-20', lon, lat)
+
+#mejora. Leer el archivo parquet sacar la fecha mayor y si falta algún periodo añadirlo, pero si no no hacer nada, que sea incremental.
